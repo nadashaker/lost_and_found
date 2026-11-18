@@ -96,8 +96,7 @@ Every video in a folder is one camera, named `<folder>_<file>`.
 
 ## Accuracy and speed
 
-`python eval.py` writes `eval/results.md`. On 50 hand-labelled items in 9 videos: 38/50 are in the index,
-and the right item is in the top 10 for 52% of text descriptions and 67% of photos. Small, distant items
+`python eval.py` writes `eval/results.md`. Small, distant items
 are the hardest.
 
 Speed, on a laptop RTX 4050: indexing a recorded video takes about 1-5x its length (crowds are slowest).
@@ -106,11 +105,9 @@ Live, each camera gets about 1 analysed frame per second with two cameras (targe
 
 ## Limitations
 
-- People: in dense crowds partly hidden or distant people are missed, and one person can be split into two.
+- People: in dense crowds partly hidden or distant people are missed.
 - Find on all cameras ranks people by appearance (clothes, colours). Similar clothes are not proof it is the same
-  person, and people walking together tend to match each other. Always check the clips.
-- Child/adult is not classified: CLIP's zero-shot guess was wrong more often than right on this footage.
-  Describe the child instead ("little girl in pink").
+  person, and people walking together tend to match each other.
 
 ## Privacy
 
