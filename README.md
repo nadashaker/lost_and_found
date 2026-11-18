@@ -37,9 +37,10 @@ The index, thumbnails and recordings also go into `data/`. Nothing is uploaded a
 
 ### More sample videos
 
-The repo ships 4 short videos in `videos/`. Three more (about 82 MB: escalators from above, a wide 4K atrium and a
-dense crowd, filmed from high up like real CCTV) are attached to the
-[`sample-videos` release](https://github.com/nadashaker/lost_and_found/releases/tag/sample-videos):
+The repo ships 4 short videos in `videos/`. Eight more (about 206 MB) are attached to the
+[`sample-videos` release](https://github.com/nadashaker/lost_and_found/releases/tag/sample-videos): three wide
+mall views filmed from high up like real CCTV (escalators, a 4K atrium, a dense crowd) and five more mall and
+street scenes, which the evaluation's hand-labelled items (`eval/ground_truth.json`) come from:
 
 ```bash
 python download_samples.py        # saves them into data/
@@ -93,7 +94,7 @@ Every video in a folder is one camera, named `<folder>_<file>`.
 | `common.py` | Settings, models, and search |
 | `store.py` | The index (SQLite in `data/index`, shared by `live.py` and the app) |
 | `eval.py` | Measures search accuracy against 50 hand-labelled items (`eval/ground_truth.json`) |
-| `download_samples.py` | Downloads 3 more sample videos (wide CCTV-style views) |
+| `download_samples.py` | Downloads 8 more sample videos from the release |
 
 ## Accuracy and speed
 
