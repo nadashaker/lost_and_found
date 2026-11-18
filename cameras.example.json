@@ -1,0 +1,4 @@
+[
+  {"name": "demo_family", "source": "videos/4750061-hd_1920_1080_30fps.mp4", "loop": true},
+  {"name": "demo_train", "source": "videos/30746-382777827_medium.mp4", "loop": true, "static": false}
+]

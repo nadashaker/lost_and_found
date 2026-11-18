@@ -1,0 +1,14 @@
+__pycache__/
+*.pyc
+# Local camera list: real cameras' RTSP URLs contain passwords. Copy cameras.example.json to cameras.json.
+cameras.json
+# This machine's folders (see README)
+local_settings.json
+# Big data (models, index, recordings, downloaded videos) lives in DATA_DIR (default ./data)
+data/
+*.mp4
+*.avi
+# ...except the small sample videos that ship with the repo
+!videos/*.mp4
+*.db
+*.pt
