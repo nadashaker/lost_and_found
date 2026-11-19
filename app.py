@@ -85,6 +85,7 @@ PAGE = """
   @media (max-width: 900px) { form { grid-template-columns: 1fr 1fr; } }
   @media (max-width: 520px) { form { grid-template-columns: 1fr; } }
   .query { margin: 18px 0 10px; color: var(--muted); }
+  .query a { color:var(--accent); text-decoration:none; }
   .grid { display:grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap:14px; }
   .card { background:var(--card); border:1px solid var(--border); border-radius:10px; overflow:hidden; }
   .card .img { height:170px; display:flex; align-items:center; justify-content:center; background:#0001; }
@@ -153,7 +154,12 @@ PAGE = """
   <div><label>Colour</label><select name="color"><option value="">Any</option>
     {% for c in colors %}<option {{ 'selected' if c == color }}>{{ c }}</option>{% endfor %}</select></div>
   <div><button>Search</button></div>
+  <input type="hidden" name="sort" value="{{ sort }}">
 </form>
+<script>
+  // "show most recent / most confident first": re-submit the form, keeping the current filters
+  function setSort(order) { const f = document.querySelector("form"); f.sort.value = order; f.submit(); return false; }
+</script>
 
 {% if similar_to %}
 <div class="similar">
@@ -166,7 +172,10 @@ PAGE = """
 {% endif %}
 <div class="query">
   {% if similar_to %}{% elif searched %}Top matches{% if text %} for "<b>{{ text }}</b>"{% endif %}{% if photo %} + uploaded photo{% endif %}
-  {% else %}All indexed {{ 'people' if people else 'items' }} (most recent first){% endif %}
+  {% else %}All indexed {{ 'people' if people else 'items' }},
+    {% if sort == 'recent' %}most recent first &middot; <a href="#" onclick="return setSort('confident')">show most confident first</a>
+    {% else %}most confident first &middot; <a href="#" onclick="return setSort('recent')">show most recent first</a>{% endif %}
+  {% endif %}
 </div>
 
 {% if results %}
@@ -199,6 +208,7 @@ def index():
     category = request.form.get("category", "")
     color = request.form.get("color", "")
     people = request.form.get("mode") == "people"
+    sort = "recent" if request.form.get("sort") == "recent" else "confident"
     photo = request.files.get("photo")
     image = Image.open(photo.stream).convert("RGB") if photo and photo.filename else None
 
@@ -206,12 +216,12 @@ def index():
     hidden = hidden_cameras(items)
     results = search(vecs, items, text=text, image=image, camera=camera, category="" if people else category,
                      color=color, top_k=12 if (text or image) else 200, skip_cameras=hidden,
-                     people=people) if items else []
+                     people=people, sort=sort) if items else []
     shown = [it for it in items if it["camera"] not in hidden]
     n_people = sum(it["category"] == PERSON for it in shown)
     return render_template_string(
         PAGE, results=results, text=text, camera=camera, category=category, color=color, photo=image is not None,
-        searched=bool(text or image), n_items=len(shown) - n_people, n_people=n_people, people=people,
+        searched=bool(text or image), n_items=len(shown) - n_people, n_people=n_people, people=people, sort=sort,
         cameras=sorted({it["camera"] for it in shown}),
         categories=sorted({it["category"] for it in shown if it["category"] != PERSON}), colors=COLORS,
         fmt=fmt_time, live=live_status(), similar_to=None)

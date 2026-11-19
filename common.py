@@ -300,13 +300,25 @@ def score_items(vecs, items, text=None, image=None, config=None, people=False):
     return np.where(keep, scores, -np.inf)
 
 
+def reliability(it):
+    """How sure the detectors are that this is a real item: its best detection's confidence, discounted when it was
+    seen in only a few frames (a single confident frame is the most common kind of false detection)."""
+    return it["confidence"] * (1 - np.exp(-it["n_sightings"] / 3))
+
+
 def search(vecs, items, text=None, image=None, camera=None, category=None, color=None, top_k=12, config=None,
-           skip_cameras=(), people=False):
+           skip_cameras=(), people=False, sort="confident"):
     """Rank indexed items. Returns a list of (score, item), best first (score None when there's no query).
     people=False searches lost items, people=True searches people.
+    Without a query, sort="confident" lists the most reliable detections first, sort="recent" the latest seen.
     Items from cameras in skip_cameras are left out."""
     scores = score_items(vecs, items, text, image, config, people=people)
-    order = np.argsort(-scores) if scores is not None else np.argsort([-it["last_seen"] for it in items])
+    if scores is not None:
+        order = np.argsort(-scores)
+    elif sort == "recent":
+        order = np.argsort([-it["last_seen"] for it in items])
+    else:
+        order = np.argsort([-reliability(it) for it in items])
     # (score_items already gives the other kind -inf; the check below also covers the no-query listing)
     results = []
     for i in order:
